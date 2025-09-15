@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { api } from "../lib/axios";
 
 interface Note {
-  _id: string;
+  id: string;
   title: string;
   content: string;
   tags: string[];
@@ -195,7 +195,7 @@ export const NotesGrid = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredNotes.map((note) => (
             <div
-              key={note._id}
+              key={note.id}
               className="bg-white border border-gray-200 rounded-lg p-6 shadow-sm hover:shadow-md transition-shadow duration-200 cursor-pointer"
             >
               <div className="mb-4">
@@ -225,7 +225,7 @@ export const NotesGrid = () => {
                   {formatDate(note.updatedAt)}
                 </small>
                 <Link
-                  to={`/edit?id=${note._id}`}
+                  to={`/edit?id=${note.id}`}
                   className="px-3 py-1 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 no-underline"
                   onClick={(e) => e.stopPropagation()}
                 >

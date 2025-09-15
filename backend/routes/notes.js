@@ -34,13 +34,32 @@ const authenticateToken = async (req, res, next) => {
   }
 };
 
-// Get all notes for authenticated user
+// Get all notes for authenticated user with optional tag filtering
 router.get("/", authenticateToken, async (req, res) => {
   try {
-    const notes = await Note.find({ userId: req.user._id }).sort({
+    const { tag } = req.query;
+    const filter = { userId: req.user._id };
+
+    // Add tag filter if provided
+    if (tag) {
+      filter.tags = tag;
+    }
+
+    const notes = await Note.find(filter).sort({
       updatedAt: -1,
     });
-    res.json(notes);
+
+    // Transform response to match API design (use 'id' instead of '_id')
+    const transformedNotes = notes.map((note) => ({
+      id: note._id,
+      title: note.title,
+      content: note.content,
+      tags: note.tags,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    }));
+
+    res.json(transformedNotes);
   } catch (error) {
     console.error("Get notes error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -59,7 +78,17 @@ router.get("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    res.json(note);
+    // Transform response to match API design
+    const transformedNote = {
+      id: note._id,
+      title: note.title,
+      content: note.content,
+      tags: note.tags,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    };
+
+    res.json(transformedNote);
   } catch (error) {
     console.error("Get note error:", error);
     res.status(500).json({ message: "Internal server error" });
@@ -85,14 +114,25 @@ router.post("/", authenticateToken, async (req, res) => {
     });
 
     await note.save();
-    res.status(201).json(note);
+
+    // Transform response to match API design
+    const transformedNote = {
+      id: note._id,
+      title: note.title,
+      content: note.content,
+      tags: note.tags,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    };
+
+    res.status(201).json(transformedNote);
   } catch (error) {
     console.error("Create note error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });
 
-// Update note
+// Update note (full update - requires title and content)
 router.put("/:id", authenticateToken, async (req, res) => {
   try {
     const { title, content, tags } = req.body;
@@ -113,9 +153,61 @@ router.put("/:id", authenticateToken, async (req, res) => {
       return res.status(404).json({ message: "Note not found" });
     }
 
-    res.json(note);
+    // Transform response to match API design
+    const transformedNote = {
+      id: note._id,
+      title: note.title,
+      content: note.content,
+      tags: note.tags,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    };
+
+    res.json(transformedNote);
   } catch (error) {
     console.error("Update note error:", error);
+    res.status(500).json({ message: "Internal server error" });
+  }
+});
+
+// Partial update note (PATCH - as specified in API design)
+router.patch("/:id", authenticateToken, async (req, res) => {
+  try {
+    const { title, content, tags } = req.body;
+    const updateFields = {};
+
+    // Only update provided fields
+    if (title !== undefined) updateFields.title = title;
+    if (content !== undefined) updateFields.content = content;
+    if (tags !== undefined) updateFields.tags = tags;
+
+    if (Object.keys(updateFields).length === 0) {
+      return res.status(400).json({ message: "No fields to update" });
+    }
+
+    const note = await Note.findOneAndUpdate(
+      { _id: req.params.id, userId: req.user._id },
+      updateFields,
+      { new: true }
+    );
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    // Transform response to match API design
+    const transformedNote = {
+      id: note._id,
+      title: note.title,
+      content: note.content,
+      tags: note.tags,
+      createdAt: note.createdAt,
+      updatedAt: note.updatedAt,
+    };
+
+    res.json(transformedNote);
+  } catch (error) {
+    console.error("Patch note error:", error);
     res.status(500).json({ message: "Internal server error" });
   }
 });

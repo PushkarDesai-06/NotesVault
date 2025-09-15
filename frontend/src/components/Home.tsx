@@ -40,34 +40,6 @@ export const Home = () => {
         </div>
       </header>
 
-      <nav style={{ marginBottom: "2rem" }}>
-        <Link
-          to="/edit"
-          style={{
-            marginRight: "1rem",
-            padding: "0.5rem 1rem",
-            backgroundColor: "#007bff",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "4px",
-          }}
-        >
-          Create Note
-        </Link>
-        <Link
-          to="/tag"
-          style={{
-            padding: "0.5rem 1rem",
-            backgroundColor: "#28a745",
-            color: "white",
-            textDecoration: "none",
-            borderRadius: "4px",
-          }}
-        >
-          View Tags
-        </Link>
-      </nav>
-
       <main>
         <NotesGrid />
       </main>
