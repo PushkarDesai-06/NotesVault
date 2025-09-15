@@ -23,6 +23,18 @@ export const Home = () => {
       >
         <h1>NotesVault</h1>
         <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
+          <Link
+            to="/tag"
+            style={{
+              padding: "0.5rem 1rem",
+              backgroundColor: "#28a745",
+              color: "white",
+              textDecoration: "none",
+              borderRadius: "4px",
+            }}
+          >
+            Tag Explorer
+          </Link>
           <span>Welcome, {user?.username}!</span>
           <button
             onClick={handleLogout}
