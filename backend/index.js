@@ -2,6 +2,8 @@ import express from "express";
 import cors from "cors";
 import mongoose from "mongoose";
 import dotenv from "dotenv";
+import authRoutes from "./routes/auth.js";
+import notesRoutes from "./routes/notes.js";
 
 // Load environment variables from .env file
 dotenv.config();
@@ -28,6 +30,10 @@ connectToMongoDB();
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Routes
+app.use("/auth", authRoutes);
+app.use("/api/notes", notesRoutes);
 
 app.get("/", (req, res) => {
   res.send("NotesVault backend is running!");
